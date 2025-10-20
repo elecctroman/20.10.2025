@@ -5,7 +5,8 @@
             <li>
                 <article>
                     <h2><a href="/blog/<?= sanitize($post['slug']) ?>"><?= sanitize($post['title']) ?></a></h2>
-                    <p><?= sanitize(mb_substr($post['content'], 0, 160)) ?>...</p>
+                    <?php $excerpt = $post['excerpt'] ?? strip_tags($post['content_html'] ?? ''); ?>
+                    <p><?= sanitize(mb_substr($excerpt, 0, 160)) ?><?= mb_strlen($excerpt) > 160 ? '…' : '' ?></p>
                 </article>
             </li>
         <?php endforeach; ?>

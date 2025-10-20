@@ -13,11 +13,16 @@
             </tr>
             </thead>
             <tbody>
-            <?php $total = 0; foreach ($cart as $item): $total += $item['product']['price'] * $item['quantity']; ?>
+            <?php $total = 0; foreach ($cart as $item): $total += ($item['product']['price'] ?? 0) * $item['quantity']; ?>
                 <tr>
-                    <td><?= sanitize($item['product']['name']) ?></td>
+                    <td>
+                        <?= sanitize($item['product']['name']) ?>
+                        <?php if (!empty($item['input_value'])): ?>
+                            <div class="input-note">Bilgi: <?= sanitize($item['input_value']) ?></div>
+                        <?php endif; ?>
+                    </td>
                     <td><?= (int) $item['quantity'] ?></td>
-                    <td>₺<?= number_format($item['product']['price'], 2) ?></td>
+                    <td>₺<?= number_format($item['product']['price'] ?? 0, 2) ?></td>
                     <td><a href="/cart/remove/<?= (int) $item['product']['id'] ?>">Kaldır</a></td>
                 </tr>
             <?php endforeach; ?>

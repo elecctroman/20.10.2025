@@ -19,11 +19,18 @@ class User extends Model
 
     public function create(array $data): int
     {
-        $stmt = database()->prepare('INSERT INTO users (name, email, password, balance, is_admin, created_at, updated_at) VALUES (:name, :email, :password, 0, 0, NOW(), NOW())');
+        $stmt = database()->prepare(
+            'INSERT INTO users (role, name, surname, email, phone, password_hash, balance, is_active, created_at, updated_at) VALUES (:role, :name, :surname, :email, :phone, :password_hash, :balance, :is_active, NOW(), NOW())'
+        );
         $stmt->execute([
+            'role' => $data['role'] ?? 'customer',
             'name' => $data['name'],
+            'surname' => $data['surname'] ?? '',
             'email' => $data['email'],
-            'password' => password_hash($data['password'], PASSWORD_DEFAULT),
+            'phone' => $data['phone'] ?? null,
+            'password_hash' => password_hash($data['password'], PASSWORD_DEFAULT),
+            'balance' => $data['balance'] ?? 0.00,
+            'is_active' => $data['is_active'] ?? 1,
         ]);
 
         return (int) database()->lastInsertId();

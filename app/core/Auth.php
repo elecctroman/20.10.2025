@@ -5,9 +5,9 @@ use App\Models\User;
 
 class Auth
 {
-    protected static ?User $user = null;
+    protected static ?array $user = null;
 
-    public static function user(): ?User
+    public static function user(): ?array
     {
         if (static::$user) {
             return static::$user;
@@ -20,7 +20,7 @@ class Auth
         $userModel = new User();
         static::$user = $userModel->find((int) $_SESSION['user_id']);
 
-        return static::$user;
+        return static::$user ?: null;
     }
 
     public static function check(): bool
@@ -33,26 +33,35 @@ class Auth
         $userModel = new User();
         $user = $userModel->findByEmail($email);
 
-        if (!$user || !password_verify($password, $user['password'])) {
+        if (!$user || empty($user['is_active']) || !password_verify($password, $user['password_hash'])) {
             return false;
         }
 
         session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
-        $_SESSION['is_admin'] = (bool) $user['is_admin'];
+        $_SESSION['role'] = $user['role'];
+
+        database()->prepare('UPDATE users SET last_login_ip = :ip, updated_at = NOW() WHERE id = :id')->execute([
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? null,
+            'id' => $user['id'],
+        ]);
+
+        static::$user = $user;
 
         return true;
     }
 
     public static function logout(): void
     {
-        unset($_SESSION['user_id'], $_SESSION['is_admin']);
+        unset($_SESSION['user_id'], $_SESSION['role']);
+        static::$user = null;
         session_regenerate_id(true);
     }
 
     public static function requireAdmin(): void
     {
-        if (!static::check() || empty($_SESSION['is_admin'])) {
+        $user = static::user();
+        if (!$user || !in_array($user['role'], ['admin', 'staff'], true)) {
             header('Location: /login');
             exit;
         }

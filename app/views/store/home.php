@@ -8,7 +8,7 @@
         <?php foreach ($products as $product): ?>
             <article class="product-card">
                 <h3><a href="/urun/<?= sanitize($product['slug']) ?>"><?= sanitize($product['name']) ?></a></h3>
-                <p><?= sanitize(mb_substr($product['description'], 0, 120)) ?>...</p>
+                <p><?= sanitize(mb_substr($product['short_desc'] ?? '', 0, 120)) ?><?= mb_strlen($product['short_desc'] ?? '') > 120 ? '…' : '' ?></p>
                 <p class="price">₺<?= number_format($product['price'], 2) ?></p>
             </article>
         <?php endforeach; ?>
@@ -20,7 +20,9 @@
         <?php foreach ($posts as $post): ?>
             <li>
                 <a href="/blog/<?= sanitize($post['slug']) ?>"><?= sanitize($post['title']) ?></a>
-                <time datetime="<?= sanitize($post['published_at']) ?>"><?= date('d.m.Y', strtotime($post['published_at'])) ?></time>
+                <?php if (!empty($post['published_at'])): ?>
+                    <time datetime="<?= sanitize($post['published_at']) ?>"><?= date('d.m.Y', strtotime($post['published_at'])) ?></time>
+                <?php endif; ?>
             </li>
         <?php endforeach; ?>
     </ul>

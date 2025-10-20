@@ -7,7 +7,10 @@ class Variant extends Model
 {
     public function byProduct(int $productId): array
     {
-        $stmt = $this->query('SELECT * FROM product_variants WHERE product_id = :product_id ORDER BY sort_order', ['product_id' => $productId]);
+        $stmt = $this->query(
+            'SELECT * FROM variants WHERE product_id = :product_id AND is_active = 1 ORDER BY id',
+            ['product_id' => $productId]
+        );
         return $stmt->fetchAll();
     }
 }

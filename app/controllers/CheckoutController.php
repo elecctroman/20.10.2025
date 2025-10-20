@@ -45,7 +45,7 @@ class CheckoutController extends Controller
             return $this->redirect('/checkout');
         }
 
-        $total = array_reduce($cart, fn ($sum, $item) => $sum + ($item['product']['price'] * $item['quantity']), 0);
+        $total = array_reduce($cart, fn ($sum, $item) => $sum + (($item['product']['price'] ?? 0) * $item['quantity']), 0.0);
 
         $gateway = new PaymentGateway();
         $result = $gateway->charge($_POST['payment_method'], [
@@ -62,35 +62,65 @@ class CheckoutController extends Controller
         $orderModel = new Order();
         $orderId = $orderModel->create([
             'user_id' => Auth::user()['id'] ?? null,
-            'total_amount' => $total,
+            'total' => $total,
             'status' => 'paid',
-            'payment_method' => $_POST['payment_method'],
+            'currency' => 'TRY',
+            'customer_note' => $_POST['customer_note'] ?? null,
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? null,
         ]);
 
-        $stockModel = new StockCode();
-        foreach ($cart as $item) {
-            database()->prepare('INSERT INTO order_items (order_id, product_id, quantity, price, created_at, updated_at) VALUES (:order_id, :product_id, :quantity, :price, NOW(), NOW())')
-                ->execute([
-                    'order_id' => $orderId,
-                    'product_id' => $item['product']['id'],
-                    'quantity' => $item['quantity'],
-                    'price' => $item['product']['price'],
-                ]);
+        $paymentStmt = database()->prepare(
+            'INSERT INTO payments (order_id, gateway, status, amount, txn_id, payload, created_at) VALUES (:order_id, :gateway, :status, :amount, :txn_id, :payload, NOW())'
+        );
+        $paymentStmt->execute([
+            'order_id' => $orderId,
+            'gateway' => $_POST['payment_method'],
+            'status' => 'success',
+            'amount' => $total,
+            'txn_id' => $result['transaction_id'] ?? null,
+            'payload' => json_encode($result, JSON_UNESCAPED_UNICODE),
+        ]);
 
-            if (!empty($item['product']['auto_delivery'])) {
+        $itemStmt = database()->prepare(
+            'INSERT INTO order_items (order_id, product_id, variant_id, qty, unit_price, requires_input_value, delivery_json) VALUES (:order_id, :product_id, :variant_id, :qty, :unit_price, :requires_input_value, :delivery_json)'
+        );
+
+        $stockModel = new StockCode();
+        $allDelivered = true;
+
+        foreach ($cart as $item) {
+            $product = $item['product'];
+            $variantId = $product['variant_id'] ?? null;
+            $deliveryPayload = [];
+
+            if (!empty($product['auto_delivery'])) {
                 for ($i = 0; $i < $item['quantity']; $i++) {
-                    $code = $stockModel->pull((int) $item['product']['id']);
+                    $code = $stockModel->pull((int) $product['id'], $variantId ? (int) $variantId : null, $orderId);
                     if ($code) {
-                        database()->prepare('UPDATE order_items SET delivered_code = :code WHERE order_id = :order_id AND product_id = :product_id AND delivered_code IS NULL LIMIT 1')
-                            ->execute([
-                                'code' => $code['code'],
-                                'order_id' => $orderId,
-                                'product_id' => $item['product']['id'],
-                            ]);
+                        $deliveryPayload[] = ['code' => $code['code']];
                     }
                 }
+                if (count($deliveryPayload) < $item['quantity']) {
+                    $allDelivered = false;
+                }
+            } else {
+                $allDelivered = false;
             }
+
+            $itemStmt->execute([
+                'order_id' => $orderId,
+                'product_id' => $product['id'],
+                'variant_id' => $variantId,
+                'qty' => $item['quantity'],
+                'unit_price' => $product['price'] ?? 0,
+                'requires_input_value' => $item['input_value'] ?? null,
+                'delivery_json' => $deliveryPayload ? json_encode($deliveryPayload, JSON_UNESCAPED_UNICODE) : null,
+            ]);
         }
+
+        $nextStatus = $allDelivered ? 'delivered' : 'processing';
+        database()->prepare('UPDATE orders SET status = :status, updated_at = NOW() WHERE id = :id')
+            ->execute(['status' => $nextStatus, 'id' => $orderId]);
 
         $_SESSION['cart'] = [];
         session_flash('success', 'Siparişiniz oluşturuldu.');

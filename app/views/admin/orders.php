@@ -14,8 +14,8 @@
         <?php foreach ($orders as $order): ?>
             <tr>
                 <td><?= (int) $order['id'] ?></td>
-                <td><?= sanitize($order['user_id']) ?></td>
-                <td>₺<?= number_format($order['total_amount'], 2) ?></td>
+                <td><?= $order['user_id'] ? sanitize((string) $order['user_id']) : 'Misafir' ?></td>
+                <td>₺<?= number_format($order['total'], 2) ?></td>
                 <td><?= sanitize($order['status']) ?></td>
                 <td><?= date('d.m.Y H:i', strtotime($order['created_at'])) ?></td>
             </tr>

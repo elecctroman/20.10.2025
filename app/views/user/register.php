@@ -4,6 +4,10 @@
         <?= csrf_field() ?>
         <label for="name">Ad</label>
         <input id="name" name="name" type="text" required>
+        <label for="surname">Soyad</label>
+        <input id="surname" name="surname" type="text" required>
+        <label for="phone">Telefon</label>
+        <input id="phone" name="phone" type="tel" pattern="[0-9+\s-]*" autocomplete="tel">
         <label for="email">E-posta</label>
         <input id="email" name="email" type="email" required>
         <label for="password">Şifre</label>

@@ -10,7 +10,7 @@
             <h2>Son Siparişler</h2>
             <ul>
                 <?php foreach (array_slice($orders, 0, 5) as $order): ?>
-                    <li>#<?= (int) $order['id'] ?> - ₺<?= number_format($order['total_amount'], 2) ?></li>
+                    <li>#<?= (int) $order['id'] ?> - ₺<?= number_format($order['total'], 2) ?></li>
                 <?php endforeach; ?>
             </ul>
         </div>

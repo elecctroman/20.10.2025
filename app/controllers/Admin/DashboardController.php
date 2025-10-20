@@ -3,21 +3,19 @@ namespace App\Controllers\Admin;
 
 use App\Core\Auth;
 use App\Core\Controller;
-use App\Models\Order;
 use App\Models\Product;
-use App\Models\User;
 
 class DashboardController extends Controller
 {
     public function index()
     {
         Auth::requireAdmin();
-        $orderModel = new Order();
         $productModel = new Product();
-        $userModel = new User();
+
+        $recentOrders = database()->query('SELECT * FROM orders ORDER BY created_at DESC LIMIT 5')->fetchAll();
 
         return $this->view('admin/dashboard', [
-            'orders' => $orderModel->byUser(Auth::user()['id']),
+            'orders' => $recentOrders,
             'productCount' => count($productModel->allActive()),
             'user' => Auth::user(),
         ], 'admin');

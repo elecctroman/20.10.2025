@@ -6,6 +6,8 @@
             <legend>İletişim Bilgileri</legend>
             <label for="email">E-posta</label>
             <input id="email" name="email" type="email" required>
+            <label for="customer-note">Notunuz</label>
+            <textarea id="customer-note" name="customer_note" rows="3" maxlength="500"></textarea>
         </fieldset>
         <fieldset>
             <legend>Ödeme Yöntemi</legend>

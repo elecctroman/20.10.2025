@@ -47,7 +47,8 @@ class AuthController extends Controller
         }
 
         $errors = Validator::make($_POST, [
-            'name' => 'required|min:3',
+            'name' => 'required|min:2',
+            'surname' => 'required|min:2',
             'email' => 'required|email',
             'password' => 'required|min:6',
         ]);
@@ -65,7 +66,9 @@ class AuthController extends Controller
 
         $userModel->create([
             'name' => $_POST['name'],
+            'surname' => $_POST['surname'],
             'email' => $_POST['email'],
+            'phone' => $_POST['phone'] ?? null,
             'password' => $_POST['password'],
         ]);
 

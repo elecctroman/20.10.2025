@@ -62,7 +62,7 @@ function view(string $template, array $data = [], string $layout = 'store', bool
     return ob_get_clean();
 }
 
-function lang(string $key = null)
+function lang(?string $key = null)
 {
     static $strings;
     if ($strings === null) {
@@ -122,6 +122,15 @@ function session_flash(string $key, ?string $value = null)
 function sanitize(string $value): string
 {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+}
+
+function sanitize_html(string $value, ?array $allowedTags = null): string
+{
+    $defaultTags = ['p', 'ul', 'ol', 'li', 'strong', 'em', 'a', 'br', 'h2', 'h3', 'h4', 'blockquote', 'code', 'pre'];
+    $allowed = $allowedTags ?? $defaultTags;
+    $allowedString = $allowed ? '<' . implode('><', $allowed) . '>' : '';
+
+    return strip_tags($value, $allowedString);
 }
 
 function rate_limit(string $key, int $maxAttempts, int $seconds): bool

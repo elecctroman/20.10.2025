@@ -23,7 +23,7 @@ class ProductController extends Controller
         return $this->view('store/product', [
             'product' => $product,
             'variants' => $variantModel->byProduct((int) $product['id']),
-            'stock' => $stockModel->remainingCount((int) $product['id']),
+            'stock' => $stockModel->remainingCount((int) $product['id'], $product['variant_id'] ?? null),
         ]);
     }
 }
