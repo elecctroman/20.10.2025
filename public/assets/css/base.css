@@ -1,0 +1,50 @@
+:root {
+    color-scheme: light;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+body {
+    margin: 0;
+    background: #f5f6fa;
+    color: #202020;
+}
+.site-header, .site-footer {
+    background: #0f172a;
+    color: #fff;
+    padding: 1rem 2rem;
+}
+.site-header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    padding: 0;
+    margin: 0;
+}
+.product-grid .grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+.alert.success { background: #d1fae5; color: #065f46; }
+.alert.error { background: #fee2e2; color: #b91c1c; }
+button, .button {
+    background: #2563eb;
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+}
+button:hover, .button:hover {
+    background: #1d4ed8;
+}
+@media (max-width: 768px) {
+    .site-header nav ul {
+        flex-direction: column;
+    }
+}
