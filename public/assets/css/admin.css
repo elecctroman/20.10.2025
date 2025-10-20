@@ -1,0 +1,295 @@
+body.admin {
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: radial-gradient(circle at top left, #020510, #050912 55%);
+    color: #f4f8ff;
+    min-height: 100vh;
+}
+
+.admin-header {
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(18px);
+    background: rgba(6, 12, 24, 0.92);
+    border-bottom: 1px solid rgba(83, 204, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    z-index: 10;
+}
+
+.admin-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem clamp(1.5rem, 4vw, 3rem);
+    gap: 2rem;
+}
+
+.admin-header .logo {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #4dd4ff;
+}
+
+.admin-header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+}
+
+.admin-header nav a {
+    color: #f4f8ff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.admin-header nav a:hover {
+    color: #8bb4ff;
+}
+
+.admin-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(12, 20, 36, 0.9);
+    padding: 0.5rem 0.9rem;
+    border-radius: 14px;
+    box-shadow: inset 0 0 0 1px rgba(83, 204, 255, 0.2);
+}
+
+.admin-user .secondary {
+    background: rgba(20, 34, 56, 0.9);
+    border-radius: 10px;
+    padding: 0.4rem 0.8rem;
+    color: #8bb4ff;
+}
+
+main {
+    padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.dashboard-grid {
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 2rem);
+}
+
+.dashboard-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+.kpi-card {
+    background: rgba(12, 20, 36, 0.92);
+    border-radius: 20px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 20px 38px rgba(3, 8, 20, 0.6);
+    display: grid;
+    gap: 0.5rem;
+}
+
+.kpi-card span {
+    font-size: 0.85rem;
+    color: rgba(200, 220, 255, 0.6);
+}
+
+.kpi-card strong {
+    font-size: 1.8rem;
+}
+
+.panel-section {
+    background: rgba(10, 16, 28, 0.9);
+    border-radius: 22px;
+    padding: 1.5rem;
+    box-shadow: 0 24px 46px rgba(3, 8, 20, 0.55);
+}
+
+.panel-section h2 {
+    margin-top: 0;
+    font-size: 1.25rem;
+}
+
+.trend-chart {
+    width: 100%;
+    height: 240px;
+}
+
+.flex-split {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: clamp(1rem, 3vw, 1.75rem);
+}
+
+.table-list {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-list th,
+.table-list td {
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid rgba(60, 80, 120, 0.3);
+    text-align: left;
+}
+
+.progress-small {
+    width: 100%;
+    height: 6px;
+    border-radius: 6px;
+    background: rgba(38, 52, 82, 0.8);
+    overflow: hidden;
+}
+
+.progress-small span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(135deg, #2ad0ff, #c445ff);
+}
+
+.badge {
+    display: inline-flex;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: rgba(42, 208, 255, 0.15);
+    color: #6ad6ff;
+    font-size: 0.75rem;
+}
+
+.badge.warning {
+    background: rgba(255, 196, 24, 0.18);
+    color: #ffce58;
+}
+
+.admin-section {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.admin-section table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(8, 12, 24, 0.9);
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.admin-section th,
+.admin-section td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid rgba(70, 100, 150, 0.2);
+}
+
+.admin-section tr:last-child td {
+    border-bottom: none;
+}
+
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background: rgba(8, 14, 26, 0.85);
+    padding: 1rem 1.25rem;
+    border-radius: 18px;
+    box-shadow: inset 0 0 0 1px rgba(78, 142, 255, 0.15);
+}
+
+.filter-bar label {
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    color: rgba(210, 225, 255, 0.75);
+}
+
+.filter-bar select,
+.stock-upload input,
+.stock-upload textarea,
+.delivery-form textarea,
+.delivery-form input {
+    background: rgba(12, 20, 36, 0.9);
+    border: 1px solid rgba(78, 142, 255, 0.25);
+    border-radius: 12px;
+    color: #f4f8ff;
+    padding: 0.5rem 0.75rem;
+}
+
+.stock-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.stock-upload,
+.stock-table,
+.delivery-card {
+    background: rgba(8, 12, 24, 0.9);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 20px 36px rgba(3, 8, 20, 0.55);
+    display: grid;
+    gap: 1rem;
+}
+
+.delivery-card header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.stock-upload h2,
+.stock-table h2,
+.delivery-card h2 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.stock-upload button,
+.delivery-form button {
+    background: linear-gradient(135deg, #2ad0ff, #c445ff);
+    border: none;
+    color: #050910;
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 0.75rem 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.stock-upload button:hover,
+.delivery-form button:hover {
+    transform: translateY(-1px);
+}
+
+.delivery-card table {
+    background: transparent;
+}
+
+.delivery-form {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.delivery-form textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.delivery-form input {
+    padding: 0.45rem 0.75rem;
+}
+
+.delivery-form button {
+    align-self: flex-start;
+}
+
+@media (max-width: 780px) {
+    .admin-header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-header nav ul {
+        flex-wrap: wrap;
+    }
+}
