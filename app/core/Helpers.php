@@ -1,6 +1,7 @@
 <?php
 use App\Core\Cache;
 use App\Core\CSRF;
+use App\Models\Setting;
 
 function config(string $key, $default = null)
 {
@@ -156,4 +157,90 @@ function audit(string $action, array $meta = []): void
         'action' => $action,
         'meta_json' => json_encode($meta, JSON_UNESCAPED_UNICODE),
     ]);
+}
+
+function settings(?string $key = null, $default = null)
+{
+    static $settings;
+    if ($settings === null) {
+        try {
+            $settings = (new Setting())->all();
+        } catch (Throwable $e) {
+            $settings = [];
+        }
+    }
+
+    if ($key === null) {
+        return $settings;
+    }
+
+    return $settings[$key] ?? $default;
+}
+
+function currency_rates(): array
+{
+    static $rates;
+    if ($rates !== null) {
+        return $rates;
+    }
+
+    $rates = cache()->remember('ecb_rates', 43200, function () {
+        $url = 'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml';
+        $context = stream_context_create([
+            'http' => [
+                'timeout' => 5,
+            ],
+            'https' => [
+                'timeout' => 5,
+            ],
+        ]);
+
+        $content = @file_get_contents($url, false, $context);
+        if (!$content) {
+            return ['EUR' => 1.0];
+        }
+
+        $xml = @simplexml_load_string($content);
+        if (!$xml) {
+            return ['EUR' => 1.0];
+        }
+
+        $data = ['EUR' => 1.0];
+        if (isset($xml->Cube->Cube)) {
+            foreach ($xml->Cube->Cube->Cube as $cube) {
+                $currency = (string) $cube['currency'];
+                $rate = (float) $cube['rate'];
+                if ($currency) {
+                    $data[$currency] = $rate;
+                }
+            }
+        }
+
+        return $data;
+    });
+
+    return $rates;
+}
+
+function convert_price_multi(float $amount): array
+{
+    $amount = max(0.0, (float) $amount);
+    $conversions = [
+        'TRY' => round($amount, 2),
+    ];
+
+    $rates = currency_rates();
+    $eurRate = $rates['TRY'] ?? null;
+
+    if ($eurRate && $eurRate > 0) {
+        $eurValue = $amount / $eurRate;
+        $conversions['EUR'] = round($eurValue, 2);
+
+        if (!empty($rates['USD'])) {
+            $usdValue = $eurValue * (float) $rates['USD'];
+            $conversions['USD'] = round($usdValue, 2);
+        }
+    }
+
+    return $conversions;
 }

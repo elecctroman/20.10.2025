@@ -904,3 +904,358 @@ label {
     background: linear-gradient(135deg, #3dd6ff, #c06bff);
     color: #0b1022;
 }
+.campaign-badges {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0;
+    margin: 0.75rem 0;
+    list-style: none;
+    flex-wrap: wrap;
+}
+
+.campaign-badges li {
+    background: linear-gradient(135deg, rgba(42, 208, 255, 0.25), rgba(127, 93, 255, 0.2));
+    border: 1px solid rgba(127, 93, 255, 0.35);
+    border-radius: 999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+}
+
+.category-showcase .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.category-card {
+    background: rgba(15, 19, 35, 0.75);
+    border: 1px solid rgba(127, 93, 255, 0.25);
+    border-radius: 1.25rem;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 24px rgba(37, 110, 255, 0.2);
+}
+
+.category-card h3 {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.category-card p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.category-link {
+    align-self: flex-start;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(42, 208, 255, 0.35), rgba(196, 69, 255, 0.3));
+    color: #f6f7ff;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.category-filter {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+    background: rgba(15, 19, 35, 0.7);
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(42, 208, 255, 0.18);
+}
+
+.category-filter .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.category-filter .filter-group label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.category-filter select,
+.category-filter input[type="number"] {
+    background: rgba(12, 16, 32, 0.9);
+    border: 1px solid rgba(127, 93, 255, 0.3);
+    border-radius: 0.75rem;
+    padding: 0.55rem 0.75rem;
+    color: #f5f7ff;
+}
+
+.filter-actions {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+.filter-actions .reset {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+}
+
+.filter-summary {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: 1rem;
+}
+
+.category-grid-responsive {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+.delivery-pill {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-size: 0.7rem;
+    background: rgba(196, 69, 255, 0.3);
+    border-radius: 999px;
+    padding: 0.2rem 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.product-price-stack {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+}
+
+.price-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0.85rem;
+    border-radius: 999px;
+    background: rgba(12, 16, 32, 0.9);
+    border: 1px solid rgba(127, 93, 255, 0.35);
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.price-chip.primary {
+    background: linear-gradient(135deg, rgba(42, 208, 255, 0.5), rgba(196, 69, 255, 0.5));
+    border-color: transparent;
+}
+
+.variant-chips {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0;
+    margin: 0.75rem 0;
+    list-style: none;
+    flex-wrap: wrap;
+}
+
+.variant-chips li {
+    font-size: 0.75rem;
+    background: rgba(12, 16, 32, 0.85);
+    border: 1px dashed rgba(127, 93, 255, 0.4);
+    border-radius: 0.75rem;
+    padding: 0.25rem 0.65rem;
+}
+
+.price-matrix {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+}
+
+.price-matrix .price {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(15, 19, 35, 0.8);
+    border: 1px solid rgba(127, 93, 255, 0.25);
+}
+
+.price-matrix .price.primary {
+    font-weight: 600;
+    background: rgba(42, 208, 255, 0.18);
+    border-color: rgba(42, 208, 255, 0.4);
+}
+
+.toast-stack {
+    position: fixed;
+    top: 1.25rem;
+    right: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    z-index: 2000;
+}
+
+.toast {
+    min-width: 240px;
+    max-width: 320px;
+    padding: 0.85rem 1rem;
+    border-radius: 1rem;
+    background: rgba(12, 16, 32, 0.92);
+    border: 1px solid rgba(127, 93, 255, 0.35);
+    color: #f5f7ff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.success {
+    border-color: rgba(52, 211, 153, 0.6);
+}
+
+.toast.error {
+    border-color: rgba(255, 99, 132, 0.6);
+}
+
+.toast button {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.whatsapp-float {
+    position: fixed;
+    bottom: 1.75rem;
+    right: 1.75rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #2ad0ff, #7f5dff);
+    color: #0b0f1f;
+    font-size: 1.5rem;
+    box-shadow: 0 18px 30px rgba(15, 111, 255, 0.35);
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: rgba(127, 93, 255, 0.25);
+    border: 1px solid rgba(127, 93, 255, 0.4);
+}
+
+.badge.success {
+    background: rgba(52, 211, 153, 0.2);
+    border-color: rgba(52, 211, 153, 0.45);
+}
+
+.badge.info {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.45);
+}
+
+.badge.warning {
+    background: rgba(251, 191, 36, 0.22);
+    border-color: rgba(251, 191, 36, 0.45);
+}
+
+.badge.error {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.45);
+}
+
+.badge.secondary {
+    background: rgba(148, 163, 184, 0.2);
+    border-color: rgba(148, 163, 184, 0.45);
+}
+
+.order-card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.order-card-head h2 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.order-meta {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.account-insights {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+}
+
+.stacked-form {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.form-control {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.form-control input,
+.stacked-form button {
+    border-radius: 0.85rem;
+}
+
+.form-control.has-error input {
+    border-color: rgba(239, 68, 68, 0.6);
+}
+
+.error-text {
+    font-size: 0.75rem;
+    color: rgba(239, 68, 68, 0.85);
+}
+
+@media (max-width: 768px) {
+    .toast-stack {
+        left: 1rem;
+        right: 1rem;
+    }
+
+    .whatsapp-float {
+        bottom: 1.25rem;
+        right: 1.25rem;
+    }
+}

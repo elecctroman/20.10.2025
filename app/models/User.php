@@ -41,4 +41,25 @@ class User extends Model
         $stmt = database()->prepare('UPDATE users SET balance = balance + :amount, updated_at = NOW() WHERE id = :id');
         $stmt->execute(['amount' => $amount, 'id' => $userId]);
     }
+
+    public function updateProfile(int $userId, array $data): void
+    {
+        $stmt = database()->prepare('UPDATE users SET name = :name, surname = :surname, email = :email, phone = :phone, updated_at = NOW() WHERE id = :id');
+        $stmt->execute([
+            'name' => $data['name'],
+            'surname' => $data['surname'],
+            'email' => $data['email'],
+            'phone' => $data['phone'] ?: null,
+            'id' => $userId,
+        ]);
+    }
+
+    public function updatePassword(int $userId, string $password): void
+    {
+        $stmt = database()->prepare('UPDATE users SET password_hash = :password, updated_at = NOW() WHERE id = :id');
+        $stmt->execute([
+            'password' => password_hash($password, PASSWORD_DEFAULT),
+            'id' => $userId,
+        ]);
+    }
 }

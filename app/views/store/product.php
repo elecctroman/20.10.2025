@@ -9,6 +9,12 @@ $deliveryLabels = [
     'manual' => 'Manuel Onay'
 ];
 $delivery = $deliveryLabels[$product['delivery_mode'] ?? 'auto'] ?? 'Otomatik Teslim';
+$prices = convert_price_multi($product['price'] ?? 0);
+$currencyIcons = [
+    'TRY' => '₺',
+    'USD' => '$',
+    'EUR' => '€',
+];
 ?>
 <article class="section-shell product-detail" aria-labelledby="product-title">
     <div class="product-gallery">
@@ -16,10 +22,15 @@ $delivery = $deliveryLabels[$product['delivery_mode'] ?? 'auto'] ?? 'Otomatik Te
     </div>
     <div>
         <header>
-            <p class="product-price">₺<?= number_format((float) ($product['price'] ?? 0), 2) ?></p>
+            <div class="product-price-stack" data-prices='<?= htmlspecialchars(json_encode($prices, JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>' aria-label="Çoklu para birimi fiyatları">
+                <?php foreach ($prices as $code => $value): ?>
+                    <span class="price-chip <?= $code === 'TRY' ? 'primary' : '' ?>"><?= $currencyIcons[$code] ?? '' ?><?= number_format((float) $value, 2) ?> <?= $code !== 'TRY' ? $code : '' ?></span>
+                <?php endforeach; ?>
+            </div>
             <h1 id="product-title"><?= sanitize($product['name']) ?></h1>
             <div class="delivery-badges">
                 <span>⚡ <?= sanitize($delivery) ?></span>
+                <span>🚀 Şimdi Teslim</span>
                 <span>🛡️ Güvenli Ödeme</span>
                 <span>📦 Stok: <?= (int) $stock ?></span>
             </div>
@@ -37,7 +48,9 @@ $delivery = $deliveryLabels[$product['delivery_mode'] ?? 'auto'] ?? 'Otomatik Te
                 <label for="variant-select">Varyant Seçimi</label>
                 <select id="variant-select" name="variant_id">
                     <?php foreach ($variants as $variant): ?>
-                        <option value="<?= (int) $variant['id'] ?>" data-price="<?= number_format((float) $variant['price'], 2) ?>">
+                        <?php $variantConversions = convert_price_multi($variant['price']); ?>
+                        <option value="<?= (int) $variant['id'] ?>"
+                                data-prices='<?= htmlspecialchars(json_encode($variantConversions, JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>'>
                             <?= sanitize($variant['name']) ?> - ₺<?= number_format((float) $variant['price'], 2) ?>
                         </option>
                     <?php endforeach; ?>
@@ -45,7 +58,7 @@ $delivery = $deliveryLabels[$product['delivery_mode'] ?? 'auto'] ?? 'Otomatik Te
             <?php endif; ?>
             <?php if ($requiresInput): ?>
                 <label for="user-input"><?= sanitize($product['input_label'] ?? 'Kullanıcı Bilgisi') ?></label>
-                <input id="user-input" name="inputs[<?= (int) $product['id'] ?>]" type="text" required>
+                <input id="user-input" name="inputs[<?= (int) $product['id'] ?>]" type="text" required placeholder="<?= sanitize($product['input_label'] ?? 'örn. ID / Kullanıcı Adı') ?>">
             <?php endif; ?>
             <div>
                 <label for="quantity">Adet</label>
@@ -67,8 +80,9 @@ $delivery = $deliveryLabels[$product['delivery_mode'] ?? 'auto'] ?? 'Otomatik Te
             <span><?= sanitize($category['name']) ?> kategorisinden öneriler</span>
         <?php endif; ?>
     </header>
-    <ul>
+    <ul class="related-grid">
         <?php foreach ($related as $item): ?>
+            <?php $relatedPrices = convert_price_multi($item['price'] ?? 0); ?>
             <li>
                 <article class="product-card">
                     <figure>
@@ -76,8 +90,16 @@ $delivery = $deliveryLabels[$product['delivery_mode'] ?? 'auto'] ?? 'Otomatik Te
                         <span class="product-tag"><?= sanitize(mb_strtoupper(mb_substr($item['name'], 0, 12))) ?></span>
                     </figure>
                     <h3><a href="/urun/<?= sanitize($item['slug']) ?>"><?= sanitize($item['name']) ?></a></h3>
+                    <div class="price-matrix">
+                        <span class="price primary">₺<?= number_format((float) ($relatedPrices['TRY'] ?? 0), 2) ?></span>
+                        <?php if (isset($relatedPrices['USD'])): ?>
+                            <span class="price">$<?= number_format((float) $relatedPrices['USD'], 2) ?></span>
+                        <?php endif; ?>
+                        <?php if (isset($relatedPrices['EUR'])): ?>
+                            <span class="price">€<?= number_format((float) $relatedPrices['EUR'], 2) ?></span>
+                        <?php endif; ?>
+                    </div>
                     <div class="product-actions">
-                        <span class="product-price">₺<?= number_format((float) ($item['price'] ?? 0), 2) ?></span>
                         <a class="button secondary" href="/urun/<?= sanitize($item['slug']) ?>">İncele</a>
                     </div>
                 </article>

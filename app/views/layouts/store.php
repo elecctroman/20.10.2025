@@ -12,6 +12,20 @@ try {
 $staticNav = [
     'PUBG', 'Valorant', 'Windows', 'Semrush', 'Adobe', 'Freepik', 'Canva', 'Shutterstock', 'Elementor'
 ];
+$contactEmail = settings('contact_email', 'support@epinmarket.test');
+$contactPhone = settings('contact_phone', '+90 212 000 00 00');
+$whatsappNumber = settings('support_whatsapp', '+90 555 000 00 00');
+$whatsappLink = settings('support_whatsapp_link', config('app.whatsapp_link'));
+if (!$whatsappLink && $whatsappNumber) {
+    $digits = preg_replace('/\D+/', '', $whatsappNumber);
+    $whatsappLink = $digits ? 'https://wa.me/' . $digits : null;
+}
+$flashMessages = [];
+foreach (['success', 'error', 'info'] as $type) {
+    if ($message = session_flash($type)) {
+        $flashMessages[] = ['type' => $type, 'message' => $message];
+    }
+}
 ?><!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -80,11 +94,11 @@ $staticNav = [
     </div>
 </header>
 <main id="content">
-    <?php if ($flash = session_flash('success')): ?>
-        <div class="alert success" role="alert"><?= sanitize($flash) ?></div>
-    <?php endif; ?>
-    <?php if ($flash = session_flash('error')): ?>
-        <div class="alert error" role="alert"><?= sanitize($flash) ?></div>
+    <div class="toast-stack" data-toast-stack aria-live="polite" aria-atomic="true"></div>
+    <?php if (!empty($flashMessages)): ?>
+        <script>
+            window.__TOASTS = <?= json_encode($flashMessages, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+        </script>
     <?php endif; ?>
     <?php $content(); ?>
 </main>
@@ -94,9 +108,9 @@ $staticNav = [
             <section>
                 <h3>İletişim</h3>
                 <ul>
-                    <li>E-posta: <a href="mailto:support@epinmarket.test">support@epinmarket.test</a></li>
-                    <li>Telefon: +90 212 000 00 00</li>
-                    <li>WhatsApp: +90 555 000 00 00</li>
+                    <li>E-posta: <a href="mailto:<?= sanitize($contactEmail) ?>"><?= sanitize($contactEmail) ?></a></li>
+                    <li>Telefon: <?= sanitize($contactPhone) ?></li>
+                    <li>WhatsApp: <?= sanitize($whatsappNumber) ?></li>
                 </ul>
             </section>
             <section>
@@ -126,6 +140,12 @@ $staticNav = [
         <p class="footer-note">&copy; <?= date('Y') ?> <?= sanitize(config('app.name')) ?> • Neon hızında dijital teslimat.</p>
     </div>
 </footer>
+<?php if ($whatsappLink): ?>
+    <a class="whatsapp-float" href="<?= sanitize($whatsappLink) ?>" target="_blank" rel="noopener" aria-label="WhatsApp üzerinden canlı destek">
+        <span aria-hidden="true">💬</span>
+        <span class="sr-only">WhatsApp Canlı Destek</span>
+    </a>
+<?php endif; ?>
 <script src="<?= asset('js/app.js') ?>" defer></script>
 </body>
 </html>

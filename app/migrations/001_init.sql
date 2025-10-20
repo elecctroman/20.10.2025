@@ -37,6 +37,7 @@ CREATE TABLE products (
     slug VARCHAR(200) NOT NULL UNIQUE,
     short_desc TEXT NULL,
     long_desc LONGTEXT NULL,
+    tags TEXT NULL,
     image VARCHAR(255) NULL,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
     delivery_mode ENUM('auto','instant','manual') NOT NULL DEFAULT 'auto',

@@ -62,15 +62,83 @@
         });
 
         const variantSelect = document.getElementById('variant-select');
-        if (variantSelect) {
-            const priceTag = document.querySelector('.product-detail .product-price');
-            variantSelect.addEventListener('change', () => {
-                const selected = variantSelect.options[variantSelect.selectedIndex];
-                const price = selected.dataset.price;
-                if (priceTag && price) {
-                    priceTag.textContent = `₺${price}`;
-                }
+        const priceStack = document.querySelector('.product-price-stack');
+        const currencySymbols = { TRY: '₺', USD: '$', EUR: '€' };
+
+        const renderPriceStack = (prices) => {
+            if (!priceStack) return;
+            const entries = Object.entries(prices || {});
+            if (!entries.length) {
+                priceStack.innerHTML = '';
+                return;
+            }
+            priceStack.innerHTML = '';
+            entries.forEach(([code, value]) => {
+                const chip = document.createElement('span');
+                chip.className = `price-chip ${code === 'TRY' ? 'primary' : ''}`;
+                chip.textContent = `${currencySymbols[code] || ''}${Number(value).toFixed(2)}${code !== 'TRY' ? ` ${code}` : ''}`;
+                priceStack.appendChild(chip);
             });
+        };
+
+        if (priceStack) {
+            try {
+                const basePrices = JSON.parse(priceStack.dataset.prices || '{}');
+                renderPriceStack(basePrices);
+            } catch (error) {
+                console.warn('Fiyat dönüştürme verisi okunamadı', error);
+            }
         }
+
+        if (variantSelect) {
+            const handleVariantChange = () => {
+                const selected = variantSelect.options[variantSelect.selectedIndex];
+                if (!selected) return;
+                try {
+                    const prices = JSON.parse(selected.dataset.prices || '{}');
+                    renderPriceStack(prices);
+                } catch (error) {
+                    console.warn('Varyant fiyatı okunamadı', error);
+                }
+            };
+
+            variantSelect.addEventListener('change', handleVariantChange);
+            handleVariantChange();
+        }
+
+        const toastStack = document.querySelector('[data-toast-stack]');
+        const spawnToast = (toast, index = 0) => {
+            if (!toastStack || !toast || !toast.message) return;
+            const node = document.createElement('div');
+            node.className = `toast ${toast.type || 'info'}`;
+            node.setAttribute('role', 'status');
+
+            const text = document.createElement('span');
+            text.textContent = toast.message;
+
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button';
+            closeBtn.setAttribute('aria-label', 'Bildirim kapat');
+            closeBtn.textContent = '×';
+
+            node.append(text, closeBtn);
+            closeBtn.addEventListener('click', () => {
+                node.classList.remove('show');
+                setTimeout(() => node.remove(), 200);
+            });
+            toastStack.appendChild(node);
+            requestAnimationFrame(() => node.classList.add('show'));
+            const lifetime = 5000 + (index * 500);
+            setTimeout(() => {
+                node.classList.remove('show');
+                setTimeout(() => node.remove(), 200);
+            }, lifetime);
+        };
+
+        if (Array.isArray(window.__TOASTS)) {
+            window.__TOASTS.forEach((toast, index) => spawnToast(toast, index));
+        }
+
+        window.showToast = (message, type = 'info') => spawnToast({ message, type });
     });
 })();

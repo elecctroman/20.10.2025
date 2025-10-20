@@ -23,6 +23,12 @@ if (!$subscriptionProducts) {
                     <div>
                         <h2 id="hero-heading"><?= sanitize($item['name']) ?></h2>
                         <p><?= sanitize(mb_substr($item['short_desc'] ?? '', 0, 160)) ?><?= mb_strlen($item['short_desc'] ?? '') > 160 ? '…' : '' ?></p>
+                        <?php $discount = 5 + (((int) ($item['id'] ?? 1)) % 15); ?>
+                        <ul class="campaign-badges" role="list">
+                            <li role="listitem">%<?= $discount ?> indirim</li>
+                            <li role="listitem">Stok: <?= (int) ($item['stock_visible'] ?? 0) ?></li>
+                            <li role="listitem">Gece teslimatı</li>
+                        </ul>
                         <div class="product-price">₺<?= number_format((float) ($item['price'] ?? 0), 2) ?></div>
                         <div class="delivery-badges" aria-label="Teslimat seçenekleri">
                             <span>⚡ Otomatik Teslim</span>
@@ -45,6 +51,27 @@ if (!$subscriptionProducts) {
         </div>
     </div>
 </section>
+<?php if (!empty($categories)): ?>
+<section class="section-shell category-showcase" aria-labelledby="category-showcase-heading">
+    <div class="section-title">
+        <h2 id="category-showcase-heading">Trend Kategoriler</h2>
+        <span>En çok ziyaret edilen oyun ve lisans koleksiyonları</span>
+    </div>
+    <div class="category-grid">
+        <?php foreach (array_slice($categories, 0, 6) as $cat): ?>
+            <article class="category-card">
+                <h3><a href="/kategori/<?= sanitize($cat['slug']) ?>"><?= sanitize($cat['name']) ?></a></h3>
+                <?php if (!empty($cat['description'])): ?>
+                    <p><?= sanitize(mb_substr($cat['description'], 0, 80)) ?><?= mb_strlen($cat['description']) > 80 ? '…' : '' ?></p>
+                <?php else: ?>
+                    <p>Dijital ürünlerde özel avantajlar sizi bekliyor.</p>
+                <?php endif; ?>
+                <a class="category-link" href="/kategori/<?= sanitize($cat['slug']) ?>" aria-label="<?= sanitize($cat['name']) ?> kategorisini görüntüle">Keşfet</a>
+            </article>
+        <?php endforeach; ?>
+    </div>
+</section>
+<?php endif; ?>
 <section class="section-shell" aria-labelledby="currency-heading">
     <div class="section-title">
         <h2 id="currency-heading">Oyun Para Birimleri</h2>

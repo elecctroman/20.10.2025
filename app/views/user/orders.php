@@ -1,3 +1,23 @@
+<?php
+$statusLabels = [
+    'pending' => 'Ödeme Bekleniyor',
+    'paid' => 'Ödeme Alındı',
+    'processing' => 'Hazırlanıyor',
+    'delivered' => 'Teslim Edildi',
+    'failed' => 'Başarısız',
+    'refunded' => 'İade Edildi',
+    'cancelled' => 'İptal Edildi',
+];
+$statusStyles = [
+    'pending' => 'warning',
+    'paid' => 'info',
+    'processing' => 'info',
+    'delivered' => 'success',
+    'failed' => 'error',
+    'refunded' => 'secondary',
+    'cancelled' => 'secondary',
+];
+?>
 <section class="section-shell" aria-labelledby="orders-title">
     <?php include __DIR__ . '/partials/tabs.php'; ?>
     <header class="section-title">
@@ -20,10 +40,14 @@
                     'cancelled' => 100,
                 ];
                 $progress = $statusMap[$order['status']] ?? 50;
+                $conversions = convert_price_multi($order['total'] ?? 0);
                 ?>
                 <article class="order-card">
-                    <h2>#<?= (int) $order['id'] ?> • <?= strtoupper($order['status']) ?></h2>
-                    <p>Tutar: ₺<?= number_format($order['total'], 2) ?> — <?= date('d.m.Y H:i', strtotime($order['created_at'])) ?></p>
+                    <div class="order-card-head">
+                        <h2>#<?= (int) $order['id'] ?></h2>
+                        <span class="badge <?= $statusStyles[$order['status']] ?? 'secondary' ?>"><?= $statusLabels[$order['status']] ?? strtoupper($order['status']) ?></span>
+                    </div>
+                    <p class="order-meta">Tutar: ₺<?= number_format($order['total'], 2) ?><?php if (isset($conversions['USD'])): ?> • $<?= number_format($conversions['USD'], 2) ?><?php endif; ?><?php if (isset($conversions['EUR'])): ?> • €<?= number_format($conversions['EUR'], 2) ?><?php endif; ?> — <?= date('d.m.Y H:i', strtotime($order['created_at'])) ?></p>
                     <div class="progress-bar"><span style="width: <?= $progress ?>%"></span></div>
                     <a class="button secondary" href="/order/<?= (int) $order['id'] ?>">Detaylar</a>
                 </article>
@@ -33,7 +57,8 @@
     <?php if (!empty($activeOrder)): ?>
         <section class="order-detail" aria-labelledby="order-detail-title">
             <h2 id="order-detail-title">Sipariş #<?= (int) $activeOrder['id'] ?> Detayı</h2>
-            <p>Durum: <strong><?= strtoupper($activeOrder['status']) ?></strong> — ₺<?= number_format($activeOrder['total'], 2) ?></p>
+            <?php $detailPrices = convert_price_multi($activeOrder['total'] ?? 0); ?>
+            <p>Durum: <span class="badge <?= $statusStyles[$activeOrder['status']] ?? 'secondary' ?>"><?= $statusLabels[$activeOrder['status']] ?? strtoupper($activeOrder['status']) ?></span> — ₺<?= number_format($activeOrder['total'], 2) ?><?php if (isset($detailPrices['USD'])): ?> • $<?= number_format($detailPrices['USD'], 2) ?><?php endif; ?><?php if (isset($detailPrices['EUR'])): ?> • €<?= number_format($detailPrices['EUR'], 2) ?><?php endif; ?></p>
             <table>
                 <thead>
                 <tr>
@@ -70,6 +95,7 @@
                                         </li>
                                     <?php endforeach; ?>
                                 </ul>
+                                <p class="input-note">Teslim edilen kodlar geçmişte saklanır, dilediğiniz zaman erişebilirsiniz.</p>
                             <?php endif; ?>
                         </td>
                     </tr>

@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\Ticket;
 use App\Models\User;
 use App\Core\CSRF;
+use App\Core\Validator;
 use App\Services\PaymentGateway;
 
 class UserController extends Controller
@@ -18,6 +19,54 @@ class UserController extends Controller
         }
 
         return $this->view('user/profile', ['user' => Auth::user()]);
+    }
+
+    public function updateProfile()
+    {
+        if (!Auth::check()) {
+            return $this->redirect('/login');
+        }
+
+        if (!CSRF::verify($_POST['_token'] ?? '')) {
+            session_flash('error', 'Oturum doğrulanamadı.');
+            return $this->redirect('/panel');
+        }
+
+        $payload = [
+            'name' => trim($_POST['name'] ?? ''),
+            'surname' => trim($_POST['surname'] ?? ''),
+            'email' => trim($_POST['email'] ?? ''),
+            'phone' => trim($_POST['phone'] ?? ''),
+        ];
+
+        $errors = Validator::make($payload, [
+            'name' => 'required|min:2|max:120',
+            'surname' => 'required|min:2|max:120',
+            'email' => 'required|email',
+        ]);
+
+        $current = Auth::user();
+        $userModel = new User();
+
+        if ($payload['email'] !== ($current['email'] ?? '')) {
+            $existing = $userModel->findByEmail($payload['email']);
+            if ($existing && (int) $existing['id'] !== (int) $current['id']) {
+                $errors['email'][] = 'Bu e-posta adresi kullanımda.';
+            }
+        }
+
+        if (!empty($errors)) {
+            $_SESSION['_form_errors']['profile'] = $errors;
+            session_flash('error', 'Bilgilerinizi kontrol ediniz.');
+            return $this->redirect('/panel');
+        }
+
+        $userModel->updateProfile((int) $current['id'], $payload);
+        Auth::sync();
+        unset($_SESSION['_form_errors']['profile']);
+        session_flash('success', 'Profiliniz güncellendi.');
+
+        return $this->redirect('/panel');
     }
 
     public function orders()
@@ -142,5 +191,50 @@ class UserController extends Controller
             'user' => $user,
             'logs' => $logs->fetchAll(),
         ]);
+    }
+
+    public function updatePassword()
+    {
+        if (!Auth::check()) {
+            return $this->redirect('/login');
+        }
+
+        if (!CSRF::verify($_POST['_token'] ?? '')) {
+            session_flash('error', 'Oturum doğrulanamadı.');
+            return $this->redirect('/panel');
+        }
+
+        $current = Auth::user();
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['password'] ?? '';
+        $confirmPassword = $_POST['password_confirmation'] ?? '';
+
+        $errors = [];
+
+        if (!password_verify($currentPassword, $current['password_hash'] ?? '')) {
+            $errors['current_password'][] = 'Mevcut parolanız doğrulanamadı.';
+        }
+
+        if (mb_strlen($newPassword) < 8) {
+            $errors['password'][] = 'Yeni parola en az 8 karakter olmalıdır.';
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            $errors['password_confirmation'][] = 'Parolalar eşleşmiyor.';
+        }
+
+        if (!empty($errors)) {
+            $_SESSION['_form_errors']['password'] = $errors;
+            session_flash('error', 'Parola güncellenemedi.');
+            return $this->redirect('/panel');
+        }
+
+        $userModel = new User();
+        $userModel->updatePassword((int) $current['id'], $newPassword);
+        Auth::sync();
+        unset($_SESSION['_form_errors']['password']);
+
+        session_flash('success', 'Parolanız güncellendi.');
+        return $this->redirect('/panel');
     }
 }
