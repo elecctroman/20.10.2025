@@ -3,6 +3,7 @@ namespace App\Controllers\Admin;
 
 use App\Core\Auth;
 use App\Core\Controller;
+use App\Models\Order;
 use App\Models\Product;
 
 class DashboardController extends Controller
@@ -11,16 +12,18 @@ class DashboardController extends Controller
     {
         Auth::requireAdmin();
         $productModel = new Product();
+        $orderModel = new Order();
         $db = database();
 
-        $recentOrders = $db->query('SELECT * FROM orders ORDER BY created_at DESC LIMIT 5')->fetchAll();
+        $timezone = new \DateTimeZone(config('app.timezone'));
+        $todayStart = (new \DateTimeImmutable('today', $timezone))->format('Y-m-d H:i:s');
+        $tomorrowStart = (new \DateTimeImmutable('tomorrow', $timezone))->format('Y-m-d H:i:s');
+        $yesterdayStart = (new \DateTimeImmutable('yesterday', $timezone))->format('Y-m-d H:i:s');
+        $shortTermStart = (new \DateTimeImmutable('-30 days', $timezone))->format('Y-m-d H:i:s');
 
-        $today = $db->query("SELECT COUNT(*) AS count, COALESCE(SUM(total),0) AS total FROM orders WHERE DATE(created_at) = CURDATE()")
-            ->fetch();
-        $yesterday = $db->query("SELECT COUNT(*) AS count, COALESCE(SUM(total),0) AS total FROM orders WHERE DATE(created_at) = DATE_SUB(CURDATE(), INTERVAL 1 DAY)")
-            ->fetch();
-        $week = $db->query("SELECT COUNT(*) AS count, COALESCE(SUM(total),0) AS total FROM orders WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")
-            ->fetch();
+        $today = $orderModel->aggregate($todayStart, $tomorrowStart);
+        $yesterday = $orderModel->aggregate($yesterdayStart, $todayStart);
+        $shortTerm = $orderModel->aggregate($shortTermStart, $tomorrowStart);
 
         $trendStmt = $db->prepare("SELECT DATE_FORMAT(created_at, '%Y-%m-01') AS month, SUM(total) AS total FROM orders WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 11 MONTH) GROUP BY month ORDER BY month");
         $trendStmt->execute();
@@ -35,20 +38,40 @@ class DashboardController extends Controller
             $months[$row['month']] = (float) $row['total'];
         }
 
-        $deliveriesStmt = $db->query("SELECT o.id AS order_id, p.name AS product_name, v.name AS variant_name, oi.qty, oi.requires_input_value, scRemaining.remaining
-            FROM orders o
-            JOIN order_items oi ON oi.order_id = o.id
-            JOIN products p ON p.id = oi.product_id
-            LEFT JOIN variants v ON v.id = oi.variant_id
-            LEFT JOIN (
-                SELECT product_id, COUNT(*) AS remaining FROM stock_codes WHERE is_used = 0 GROUP BY product_id
-            ) scRemaining ON scRemaining.product_id = p.id
-            WHERE o.status IN ('paid','processing')");
-        $pendingDeliveries = $deliveriesStmt->fetchAll();
+        $pendingManual = $orderModel->allPendingManual();
+        $pendingDeliveries = [];
+        foreach ($pendingManual as $order) {
+            foreach ($order['items'] as $item) {
+                $pendingDeliveries[] = [
+                    'order_id' => $order['id'],
+                    'product_name' => $item['product_name'],
+                    'variant_name' => $item['variant_name'],
+                    'qty' => $item['qty'],
+                    'remaining' => $item['remaining'],
+                ];
+            }
+        }
 
-        $topStmt = $db->prepare("SELECT p.name, SUM(oi.qty) AS quantity FROM order_items oi JOIN orders o ON o.id = oi.order_id JOIN products p ON p.id = oi.product_id WHERE o.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) GROUP BY p.name ORDER BY quantity DESC LIMIT 5");
-        $topStmt->execute();
-        $topSellers = $topStmt->fetchAll();
+        $distributionRaw = $orderModel->statusBreakdown($shortTermStart, $tomorrowStart);
+        $distribution = [
+            'waiting' => 0,
+            'stock' => 0,
+            'done' => 0,
+            'failed' => 0,
+        ];
+        foreach ($distributionRaw as $status => $count) {
+            $bucket = match ($status) {
+                'pending' => 'waiting',
+                'paid', 'processing' => 'stock',
+                'delivered' => 'done',
+                'failed', 'cancelled', 'refunded' => 'failed',
+                default => 'waiting',
+            };
+            $distribution[$bucket] += $count;
+        }
+
+        $topSellers = $orderModel->topSellersSince($shortTermStart);
+        $recentOrders = $orderModel->recentWithUser(5);
 
         return $this->view('admin/dashboard', [
             'orders' => $recentOrders,
@@ -56,10 +79,11 @@ class DashboardController extends Controller
             'user' => Auth::user(),
             'today' => $today,
             'yesterday' => $yesterday,
-            'week' => $week,
+            'shortTerm' => $shortTerm,
             'trend' => $months,
             'pendingDeliveries' => $pendingDeliveries,
             'topSellers' => $topSellers,
+            'distribution' => $distribution,
         ], 'admin');
     }
 }

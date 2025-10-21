@@ -125,6 +125,22 @@ function sanitize(string $value): string
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
+function mask_string(string $value, int $visibleStart = 4, int $visibleEnd = 2, string $maskChar = '•'): string
+{
+    $length = mb_strlen($value, 'UTF-8');
+    if ($length <= 0) {
+        return '';
+    }
+
+    if ($length <= $visibleStart + $visibleEnd) {
+        return str_repeat($maskChar, $length);
+    }
+
+    $start = mb_substr($value, 0, $visibleStart, 'UTF-8');
+    $end = mb_substr($value, -$visibleEnd, null, 'UTF-8');
+    return $start . str_repeat($maskChar, $length - $visibleStart - $visibleEnd) . $end;
+}
+
 function sanitize_html(string $value, ?array $allowedTags = null): string
 {
     $defaultTags = ['p', 'ul', 'ol', 'li', 'strong', 'em', 'a', 'br', 'h2', 'h3', 'h4', 'blockquote', 'code', 'pre'];
