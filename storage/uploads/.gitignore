@@ -1,0 +1,8 @@
+*
+!.gitignore
+!banners/
+!banners/.gitignore
+!product/
+!product/.gitignore
+!blog/
+!blog/.gitignore

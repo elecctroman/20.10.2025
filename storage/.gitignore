@@ -1,0 +1,14 @@
+*
+!.gitignore
+!cache/
+!cache/.gitignore
+!logs/
+!logs/.gitignore
+!uploads/
+!uploads/.gitignore
+!uploads/banners/
+!uploads/banners/.gitignore
+!uploads/product/
+!uploads/product/.gitignore
+!uploads/blog/
+!uploads/blog/.gitignore
